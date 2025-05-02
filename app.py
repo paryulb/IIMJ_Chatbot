@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from fuzzywuzzy import fuzz
+from rapidfuzz import fuzz
 import os
 
 # --- File Setup ---
