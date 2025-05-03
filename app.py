@@ -100,6 +100,7 @@ with tab2:
                         # Update the main FAQ
                         faq_df = pd.concat([faq_df, new_faq], ignore_index=True)
                         faq_df.to_excel(faq_file, index=False)
+                        faq_df = pd.read_excel(faq_file)
 
                         # Remove from unanswered
                         unanswered_df = unanswered_df[
@@ -124,7 +125,7 @@ with tab2:
 
             else:
                 st.info("No questions left under this category.")
-    else:
+     else:
         st.error("❌ Incorrect password. Try again.")
                        
 
