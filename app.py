@@ -125,7 +125,7 @@ with tab2:
 
             else:
                 st.info("No questions left under this category.")
-     else:
+    else:
         st.error("❌ Incorrect password. Try again.")
                        
 
