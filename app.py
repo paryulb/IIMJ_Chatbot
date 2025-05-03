@@ -70,7 +70,7 @@ with tab2:
     st.markdown("### 🔐 Admin Access")
     password = st.text_input("Enter Admin Password", type="password")
 
-    if password == "Paryul@1006":
+if password == "Paryul@1006":
         st.success("✅ Access granted. Manage unanswered questions below.")
 
         unanswered_categories = unanswered_df["Category"].dropna().unique()
@@ -108,7 +108,6 @@ with tab2:
                         unanswered_df.to_excel(unanswered_file, index=False)
 
                         st.success("✅ Answer added and removed from unanswered list.")
-                        st.experimental_rerun()  # Refresh UI after update
 
                         # 👇 After all update logic
                         st.subheader("📄 Current Unanswered Questions")
@@ -125,7 +124,7 @@ with tab2:
 
             else:
                 st.info("No questions left under this category.")
-    else:
+else:
         st.error("❌ Incorrect password. Try again.")
                        
 
