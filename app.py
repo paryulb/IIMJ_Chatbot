@@ -47,10 +47,15 @@ with tab1:
             st.success(f"**Answer:** {answer}")
         else:
             st.warning("Sorry, I don't know the answer yet. We'll get back to you soon.")
-            if not ((unanswered_df["Question"] == user_q) & (unanswered_df["Category"] == selected_cat)).any():
+          if not ((unanswered_df["Question"].str.lower() == user_q.lower()) & (unanswered_df["Category"] == selected_cat)).any():
                 new_entry = pd.DataFrame({"Category": [selected_cat], "Question": [user_q]})
                 unanswered_df = pd.concat([unanswered_df, new_entry], ignore_index=True)
-                unanswered_df.to_excel(unanswered_file, index=False)
+                try:
+                    unanswered_df.to_excel(unanswered_file, index=False)
+                    st.info("Unanswered question logged.")
+                except Exception as e:
+                    st.error(f"Error saving to unanswered.xlsx: {e}")
+
 
 # ============================
 # ======= ADMIN PANEL ========
