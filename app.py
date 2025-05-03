@@ -47,54 +47,75 @@ with tab1:
             st.success(f"**Answer:** {answer}")
         else:
             st.warning("Sorry, I don't know the answer yet. We'll get back to you soon.")
-            if not ((unanswered_df["Question"].str.lower() == user_q.lower()) & (unanswered_df["Category"] == selected_cat)).any():
+            
+            already_logged = ((unanswered_df["Question"].str.lower() == user_q.lower()) & 
+                              (unanswered_df["Category"] == selected_cat)).any()
+            
+            if not already_logged:
                 new_entry = pd.DataFrame({"Category": [selected_cat], "Question": [user_q]})
                 unanswered_df = pd.concat([unanswered_df, new_entry], ignore_index=True)
+
                 try:
                     unanswered_df.to_excel(unanswered_file, index=False)
-                    st.info("Unanswered question logged.")
+                    # ✅ Reload to refresh file state
+                    unanswered_df = pd.read_excel(unanswered_file)
+                    st.info("✅ Unanswered question logged and sheet refreshed.")
                 except Exception as e:
                     st.error(f"Error saving to unanswered.xlsx: {e}")
-
 
 # ============================
 # ======= ADMIN PANEL ========
 # ============================
 with tab2:
-    st.markdown("### Admin Access")
+    st.markdown("### 🔐 Admin Access")
     password = st.text_input("Enter Admin Password", type="password")
 
-    if password == "Paryul@1006":  # You can change this
-        st.success("Access granted. You can now manage unanswered questions.")
+    if password == "Paryul@1006":
+        st.success("✅ Access granted. Manage unanswered questions below.")
 
-        admin_cat = st.selectbox("Select category", unanswered_df["Category"].dropna().unique())
-        cat_questions = unanswered_df[unanswered_df["Category"] == admin_cat]["Question"].drop_duplicates()
+        unanswered_categories = unanswered_df["Category"].dropna().unique()
 
-        if not cat_questions.empty:
-            admin_q = st.selectbox("Select question to answer", cat_questions)
-            admin_ans = st.text_area("Enter your answer here")
-
-            if st.button("Submit Answer"):
-                new_faq = pd.DataFrame({
-                    "Category": [admin_cat],
-                    "Keyword": [""],
-                    "Question": [admin_q],
-                    "Answer": [admin_ans]
-                })
-
-                # Update FAQ and unanswered
-                faq_df = pd.concat([faq_df, new_faq], ignore_index=True)
-                faq_df.to_excel(faq_file, index=False)
-
-                unanswered_df = unanswered_df[~((unanswered_df["Category"] == admin_cat) & (unanswered_df["Question"] == admin_q))]
-                unanswered_df.to_excel(unanswered_file, index=False)
-
-                st.success("✅ Answer added to FAQ and removed from unanswered list!")
+        if len(unanswered_categories) == 0:
+            st.info("🎉 All questions have been answered!")
         else:
-            st.info("No unanswered questions in this category.")
+            admin_cat = st.selectbox("Select a category", unanswered_categories)
+
+            cat_questions = unanswered_df[unanswered_df["Category"] == admin_cat]["Question"].drop_duplicates()
+
+            if not cat_questions.empty:
+                admin_q = st.selectbox("Select question to answer", cat_questions)
+                admin_ans = st.text_area("Enter your answer here")
+
+                if st.button("✅ Submit Answer"):
+                    if admin_ans.strip() == "":
+                        st.error("⚠️ Please enter an answer before submitting.")
+                    else:
+                        new_faq = pd.DataFrame({
+                            "Category": [admin_cat],
+                            "Keyword": [""],  # Optional keyword field
+                            "Question": [admin_q],
+                            "Answer": [admin_ans]
+                        })
+
+                        # Update the main FAQ
+                        faq_df = pd.concat([faq_df, new_faq], ignore_index=True)
+                        faq_df.to_excel(faq_file, index=False)
+
+                        # Remove from unanswered
+                        unanswered_df = unanswered_df[
+                            ~((unanswered_df["Category"] == admin_cat) & (unanswered_df["Question"] == admin_q))
+                        ]
+                        unanswered_df.to_excel(unanswered_file, index=False)
+
+                        st.success("✅ Answer added and removed from unanswered list.")
+                        st.experimental_rerun()  # Refresh UI after update
+
+            else:
+                st.info("No questions left under this category.")
     else:
         if password:
-            st.error("Incorrect password. Try again.")
+            st.error("❌ Incorrect password. Try again.")
+
 
 # =============================
 # ========= FOOTER ============
