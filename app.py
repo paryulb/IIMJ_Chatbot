@@ -109,28 +109,25 @@ with tab2:
 
                         st.success("✅ Answer added and removed from unanswered list.")
                         st.experimental_rerun()  # Refresh UI after update
-                                  # 👇 After all update logic
+
+                        # 👇 After all update logic
                         st.subheader("📄 Current Unanswered Questions")
                         st.dataframe(unanswered_df)
 
                         st.subheader("📘 Current FAQ")
                         st.dataframe(faq_df)
 
-
                         with open(unanswered_file, "rb") as f:
-                          st.download_button("📥 Download Unanswered Questions", f, file_name="unanswered.xlsx")
+                            st.download_button("📥 Download Unanswered Questions", f, file_name="unanswered.xlsx")
 
                         with open(faq_file, "rb") as f:
-                          st.download_button("📥 Download FAQ", f, file_name="faq.xlsx")
-
-
-
+                            st.download_button("📥 Download FAQ", f, file_name="faq.xlsx")
 
             else:
                 st.info("No questions left under this category.")
     else:
-        if password:
-            st.error("❌ Incorrect password. Try again.")
+        st.error("❌ Incorrect password. Try again.")
+                       
 
 
 # =============================
