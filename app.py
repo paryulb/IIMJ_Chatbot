@@ -70,7 +70,7 @@ with tab2:
     st.markdown("### 🔐 Admin Access")
     password = st.text_input("Enter Admin Password", type="password")
 
-if password == "Paryul@1006":
+    if password == "Paryul@1006":
         st.success("✅ Access granted. Manage unanswered questions below.")
 
         unanswered_categories = unanswered_df["Category"].dropna().unique()
@@ -124,7 +124,7 @@ if password == "Paryul@1006":
 
             else:
                 st.info("No questions left under this category.")
-else:
+    else:
         st.error("❌ Incorrect password. Try again.")
                        
 
