@@ -94,5 +94,5 @@ with tab2:
 # =============================
 # ========= FOOTER ============
 # =============================
-st.markdown("<hr><center>Developed with ❤️ by Paryul (ipm24083@gmail.com), IIM Jammu</center>", unsafe_allow_html=True)
+st.markdown("<hr><center>Developed with ❤️ by Paryul (ipm24083@iimj.ac.in), IIM Jammu</center>", unsafe_allow_html=True)
 st.markdown("<center>Some answers are taken from the official IIM Jammu Handbook.</center>", unsafe_allow_html=True)
