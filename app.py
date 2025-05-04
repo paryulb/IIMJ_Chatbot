@@ -48,8 +48,7 @@ with tab1:
         else:
             st.warning("Sorry, I don't know the answer yet. We'll get back to you soon.")
             
-            already_logged = ((unanswered_df["Question"].str.lower() == user_q.lower()) & 
-                              (unanswered_df["Category"] == selected_cat)).any()
+            already_logged = ((unanswered_df["Question"].str.lower() == user_q.lower()) & (unanswered_df["Category"] == selected_cat)).any()
             
             if not already_logged:
                 new_entry = pd.DataFrame({"Category": [selected_cat], "Question": [user_q]})
