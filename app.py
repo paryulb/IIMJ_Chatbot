@@ -37,29 +37,33 @@ with tab1:
     question = st.text_input("Type your question here")
 
     if st.button("Get Answer"):
-        matching = chatbot[chatbot["Category"] == selected_cat]
-        scores = matching["Question"].apply(lambda q: fuzz.ratio(str(q).lower(), question.lower()))  #fuzzy logic chapter 13
-
-        if scores.max() >= 60:
-            best_idx = scores.idxmax()
-            answer = chatbot.loc[best_idx, "Answer"]
-            st.success(f"**Answer:** {answer}")
+        if user_q.strip() == "":
+            st.warning("Please Enter Question First")
         else:
-            st.warning("Sorry, We'll get back to you soon. You can try asking same after sometime. :)")
-            
-            already_logged = ((una_que["Question"].astype(str).str.lower() == user_q.lower()) & (una_que["Category"] == selected_cat)).any()
-            
-            if not already_logged:
-                new_entry = pd.DataFrame({"Category": [selected_cat], "Question": [question]})
-                una_que = pd.concat([una_que, new_entry], ignore_index=True)
+            matching = chatbot[chatbot["Category"] == selected_cat]
+            scores = matching["Question"].apply(lambda q: fuzz.ratio(str(q).lower(), question.lower()))  #fuzzy logic chapter 13
+            if scores.max() >= 60:
+                best_idx = scores.idxmax()
+                answer = chatbot.loc[best_idx, "Answer"]
+                st.success(f"**Answer:** {answer}")
+            else:
+                st.warning("Sorry, we'll get back to you soon. :)")
 
-                try:
-                    una_que.to_excel(unanswered_questions, index=False)
-                    una_que = pd.read_excel(unanswered_questions)
-                    st.info("Sheet refresh success.")
-                except Exception as e:
-                    st.error(f"Error saving to unanswered.xlsx: {e}")
+                already_logged = (
+                    (una_que["Question"].astype(str).str.lower() == user_q.lower()) &
+                    (una_que["Category"] == selected_cat)
+                ).any()
 
+                if not already_logged:
+                    new_entry = pd.DataFrame({"Category": [selected_cat], "Question": [user_q]})
+                    una_que = pd.concat([una_que, new_entry], ignore_index=True)
+
+                    try:
+                        una_que.to_excel(unanswered_questions, index=False)
+                        st.info("Sheet updated successfully.")
+                    except Exception as e:
+                        st.error(f"Error saving to unanswered.xlsx: {e}")
+       
 
 # ======= ADMIN PANEL ========
 
