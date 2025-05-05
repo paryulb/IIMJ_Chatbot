@@ -55,7 +55,7 @@ with tab1:
                 ).any()
 
                 if not already_logged:
-                    new_entry = pd.DataFrame({"Category": [selected_cat], "Question": [user_q]})
+                    new_entry = pd.DataFrame({"Category": [selected_cat], "Question": [question]})
                     una_que = pd.concat([una_que, new_entry], ignore_index=True)
 
                     try:
