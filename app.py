@@ -37,7 +37,7 @@ with tab1:
     question = st.text_input("Type your question here")
 
     if st.button("Get Answer"):
-        if user_q.strip() == "":
+        if question.strip() == "":
             st.warning("Please Enter Question First")
         else:
             matching = chatbot[chatbot["Category"] == selected_cat]
@@ -50,7 +50,7 @@ with tab1:
                 st.warning("Sorry, we'll get back to you soon. :)")
 
                 already_logged = (
-                    (una_que["Question"].astype(str).str.lower() == user_q.lower()) &
+                    (una_que["Question"].astype(str).str.lower() == question.lower()) &
                     (una_que["Category"] == selected_cat)
                 ).any()
 
@@ -124,8 +124,12 @@ with tab2:
         if st.button("Save Changes"):
             edited_faq.to_excel(chatbot_original, index=False)
             st.success("FAQ updated and saved permanently")
-            chatbot = pd.read_excel(chatbot_original)
-            st.dataframe(chatbot)
+            try:
+                chatbot = pd.read_excel(chatbot_original)
+                st.dataframe(chatbot)
+            except Exception as e:
+                st.error(f"Error: {e}")
+                
         
 
         with open(unanswered_questions, "rb") as f:
