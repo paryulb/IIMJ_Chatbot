@@ -130,8 +130,6 @@ with tab2:
         with open(chatbot_original, "rb") as f:
             st.download_button("📥 Download FAQ", f, file_name="faq.xlsx")
 
-            else:
-                st.info("No questions left under this category.")
     else:
         st.error("Incorrect password. Try again.")
                        
