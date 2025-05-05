@@ -114,7 +114,7 @@ with tab2:
         edited_faq = st.data_editor(chatbot, num_rows="dynamic", use_container_width=True)
 
         if st.button("Save Changes"):
-            edited_faq.to_excel(chatbot_original, index=False}
+            edited_faq.to_excel(chatbot_original, index=False)
             st.success("FAQ updated and saved permanently")
             chatbot = pd.read_excel(chatbot_original)
             st.dataframe(chatbot)
