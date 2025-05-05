@@ -22,7 +22,7 @@ else:
 
 # visual of my page
 st.set_page_config(page_title="IIMJ MITRA", layout="wide")
-st.markdown("<h1 style='text-align: center; color: #0E4D92;'>IIM'J Mitra/h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: #0E4D92;'>IIM'J Mitra</h1>", unsafe_allow_html=True)
 st.image("logo.png", width=120)
 
 tab1, tab2 = st.tabs(["🤖 Chatbot", "🛠️ Admin Panel"])
@@ -34,11 +34,11 @@ with tab1:
     categories = chatbot["Category"].dropna().unique()   #deopna will give dropdown menu
     selected_cat = st.selectbox("Select a category", categories)
 
-    user_q = st.text_input("Type your question here")
+    question = st.text_input("Type your question here")
 
     if st.button("Get Answer"):
         matching = chatbot[chatbot["Category"] == selected_cat]
-        scores = matching["Question"].apply(lambda q: fuzz.ratio(str(q).lower(), user_q.lower()))  #fuzzy logic chapter 13
+        scores = matching["Question"].apply(lambda q: fuzz.ratio(str(q).lower(), question.lower()))  #fuzzy logic chapter 13
 
         if scores.max() >= 60:
             best_idx = scores.idxmax()
@@ -50,12 +50,12 @@ with tab1:
             already_logged = ((una_que["Question"].astype(str).str.lower() == user_q.lower()) & (una_que["Category"] == selected_cat)).any()
             
             if not already_logged:
-                new_entry = pd.DataFrame({"Category": [selected_cat], "Question": [user_q]})
+                new_entry = pd.DataFrame({"Category": [selected_cat], "Question": [question]})
                 una_que = pd.concat([una_que, new_entry], ignore_index=True)
 
                 try:
                     una_que.to_excel(unanswered_questions, index=False)
-                    unanswered_df = pd.read_excel(unanswered_file)
+                    una_que = pd.read_excel(unanswered_questions)
                     st.info("Sheet refresh success.")
                 except Exception as e:
                     st.error(f"Error saving to unanswered.xlsx: {e}")
@@ -70,13 +70,14 @@ with tab2:
     if password == "Paryul@1006":
         st.success("✅ Manage unanswered questions below.")
 
-        unanswered_categories = unanswered_df["Category"].dropna().unique()
+        una_que = pd.read_excel(unanswered_questions)
+        chatbot = pd.read_excel(chatbot_original)
+        unanswered_categories = una_que["Category"].dropna().unique()
 
         if len(unanswered_categories) == 0:
             st.info("All questions have been answered.")
         else:
             admin_cat = st.selectbox("Select Category", unanswered_categories)
-
             cat_questions = una_que[una_que["Category"] == admin_cat]["Question"].drop_duplicates()
 
             if not cat_questions.empty:
@@ -85,7 +86,7 @@ with tab2:
 
                 if st.button("Submit Answer"):
                     if admin_ans.strip() == "":
-                        st.error("Can not be empty field.")
+                        st.error("Cannot be empty field.")
                     else:
                         new_faq = pd.DataFrame({
                             "Category": [admin_cat],  
@@ -105,6 +106,9 @@ with tab2:
                         una_que.to_excel(unanswered_questions, index=False)
 
                         st.success("✅ Answer added and removed from unanswered list.")
+            else:
+                st.info("No questions left")
+                
         st.subheader("📄 Current Unanswered Questions")
         una_que = pd.read_excel(unanswered_questions)
         st.dataframe(una_que)
@@ -123,7 +127,7 @@ with tab2:
         with open(unanswered_questions, "rb") as f:
             st.download_button("📥 Download Unanswered Questions", f, file_name="unanswered.xlsx")
 
-        with open(faq_file, "rb") as f:
+        with open(chatbot_original, "rb") as f:
             st.download_button("📥 Download FAQ", f, file_name="faq.xlsx")
 
             else:
