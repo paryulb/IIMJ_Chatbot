@@ -3,11 +3,11 @@ import pandas as pd
 from rapidfuzz import fuzz
 import os
 
-# --- File Setup ---
+# file intro
 faq_file = 'Chatbot_MIS_fuzz.xlsx'
 unanswered_file = 'unanswered.xlsx'
 
-# --- Load or create Excel files ---
+# loading files
 if os.path.exists(faq_file):
     faq_df = pd.read_excel(faq_file)
 else:
@@ -20,16 +20,15 @@ else:
     unanswered_df = pd.DataFrame(columns=["Category", "Question"])
     unanswered_df.to_excel(unanswered_file, index=False)
 
-# --- Page Setup ---
+# visual of my page
 st.set_page_config(page_title="IIMJ MITRA", layout="wide")
-st.markdown("<h1 style='text-align: center; color: #0E4D92;'>IIM Smart Chatbot</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: #0E4D92;'>IIM'J Mitra/h1>", unsafe_allow_html=True)
 st.image("logo.png", width=120)
 
 tab1, tab2 = st.tabs(["🤖 Chatbot", "🛠️ Admin Panel"])
 
-# ========================
-# ======= CHATBOT ========
-# ========================
+
+# ======= Chatbot Coding ========
 with tab1:
     st.markdown("### Ask a Question")
     categories = faq_df["Category"].dropna().unique()
@@ -41,12 +40,12 @@ with tab1:
         matched_faqs = faq_df[faq_df["Category"] == selected_cat]
         scores = matched_faqs["Question"].apply(lambda q: fuzz.ratio(str(q).lower(), user_q.lower()))
 
-        if scores.max() >= 70:
+        if scores.max() >= 60:
             best_idx = scores.idxmax()
             answer = faq_df.loc[best_idx, "Answer"]
             st.success(f"**Answer:** {answer}")
         else:
-            st.warning("Sorry, I don't know the answer yet. We'll get back to you soon.")
+            st.warning("Sorry, I don't know the answer yet. We'll get back to you soon. You can try asking same after sometime. :)")
             
             already_logged = ((unanswered_df["Question"].astype(str).str.lower() == user_q.lower()) & (unanswered_df["Category"] == selected_cat)).any()
             
@@ -56,26 +55,26 @@ with tab1:
 
                 try:
                     unanswered_df.to_excel(unanswered_file, index=False)
-                    # ✅ Reload to refresh file state
+                    # Reload to refresh file state
                     unanswered_df = pd.read_excel(unanswered_file)
-                    st.info("✅ Unanswered question logged and sheet refreshed.")
+                    st.info("Unanswered question logged and sheet refreshed.")
                 except Exception as e:
                     st.error(f"Error saving to unanswered.xlsx: {e}")
 
-# ============================
+
 # ======= ADMIN PANEL ========
-# ============================
+
 with tab2:
     st.markdown("### 🔐 Admin Access")
-    password = st.text_input("Enter Admin Password", type="password")
+    password = st.text_input("Enter Your Password", type="password")
 
     if password == "Paryul@1006":
-        st.success("✅ Access granted. Manage unanswered questions below.")
+        st.success("✅ Manage unanswered questions below.")
 
         unanswered_categories = unanswered_df["Category"].dropna().unique()
 
         if len(unanswered_categories) == 0:
-            st.info("🎉 All questions have been answered!")
+            st.info("All questions have been answered!")
         else:
             admin_cat = st.selectbox("Select a category", unanswered_categories)
 
@@ -96,7 +95,7 @@ with tab2:
                             "Answer": [admin_ans]
                         })
 
-                        # Update the main FAQ
+                        # Updating my original xl
                         faq_df = pd.concat([faq_df, new_faq], ignore_index=True)
                         faq_df.to_excel(faq_file, index=False)
                         faq_df = pd.read_excel(faq_file)
@@ -108,29 +107,35 @@ with tab2:
                         unanswered_df.to_excel(unanswered_file, index=False)
 
                         st.success("✅ Answer added and removed from unanswered list.")
+        st.subheader("📄 Current Unanswered Questions")
+        unanswered_df = pd.read_excel(unanswered_file)
+        st.dataframe(unanswered_df)
 
-                        # 👇 After all update logic
-                        st.subheader("📄 Current Unanswered Questions")
-                        st.dataframe(unanswered_df)
+        st.subheader("📘 Current FAQ (You can edit")
+        faq_df = pd.read_excel(faq_file)
+        edited_faq = st.data_editor(faq_df, num_rows="dynamic", use_container_width=True)
 
-                        st.subheader("📘 Current FAQ")
-                        st.dataframe(faq_df)
+        if st.button("Save Changes"):
+            edited_faq.to_excel(faq_file, index=False}
+            st.success("FAQ updated and saved permanently")
+            faq_df = pd.read_excel(faq_file)
+            st.dataframe(faq_df)
+        
 
-                        with open(unanswered_file, "rb") as f:
-                            st.download_button("📥 Download Unanswered Questions", f, file_name="unanswered.xlsx")
+        with open(unanswered_file, "rb") as f:
+            st.download_button("📥 Download Unanswered Questions", f, file_name="unanswered.xlsx")
 
-                        with open(faq_file, "rb") as f:
-                            st.download_button("📥 Download FAQ", f, file_name="faq.xlsx")
+        with open(faq_file, "rb") as f:
+            st.download_button("📥 Download FAQ", f, file_name="faq.xlsx")
 
             else:
                 st.info("No questions left under this category.")
     else:
-        st.error("❌ Incorrect password. Try again.")
+        st.error("Incorrect password. Try again.")
                        
 
 
-# =============================
-# ========= FOOTER ============
-# =============================
+
+# =========Footer (always appearing) & credits============
 st.markdown("<hr><center>Developed with ❤️ by Paryul (ipm24083@iimj.ac.in), IIM Jammu</center>", unsafe_allow_html=True)
 st.markdown("<center>Some answers are taken from the official IIM Jammu Handbook.</center>", unsafe_allow_html=True)
